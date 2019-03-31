@@ -2,7 +2,6 @@
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-
 namespace DIrectoryTree
 {
     class DirectoryProccesing
@@ -65,16 +64,24 @@ namespace DIrectoryTree
 
                     foreach (var dir in directories)
                     {
-                        Indent(true);
-                        output.Append(tab + dir.Name + ":\n");
-                        WorkWithDirectory(dir.FullName, true);
-                        Indent(false);
+                        var d = tab + dir.Name + ":\n";
+                        if (CheckDateOfCreate(dir))
+                        {
+                            Indent(true);
+                            output.Append(d);
+                            WorkWithDirectory(dir.FullName, true);
+                            Indent(false);
+                        }
                     }
                     foreach (var file in files)
                     {
-                        Indent(true);
-                        output.Append(tab + "-" + file + "\n");
-                        Indent(false);
+                        var f = tab + "-" + file + "\n";
+                        if (CheckDateOfCreate(file))
+                        {
+                            Indent(true);
+                            output.Append(f);
+                            Indent(false);
+                        }
                     }
                 }
                 else
@@ -108,5 +115,36 @@ namespace DIrectoryTree
             }
         }
 
+        public bool CheckDateOfCreate(FileInfo file)
+        {
+            var creationDate = file.CreationTime.Year + file.CreationTime.DayOfYear;
+            var currentDate = DateTime.Now.Year + DateTime.Now.DayOfYear;
+            var setDate = currentDate - 17;
+            if (creationDate < setDate)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public bool CheckDateOfCreate(DirectoryInfo file)
+        {
+            var creationDate = file.CreationTime.Year + file.CreationTime.DayOfYear;
+            var currentDate = DateTime.Now.Year + DateTime.Now.DayOfYear;
+            var setDate = currentDate - 17;
+            if (creationDate < setDate)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
     }
 }
