@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 
 namespace DIrectoryTree
@@ -8,28 +9,48 @@ namespace DIrectoryTree
     {
         private StringBuilder tab = new StringBuilder();
         private string pathToWriting;
+        private string pathForArchive;
         private StringBuilder output = new StringBuilder();
 
-        public DirectoryProccesing()
+        public void GetStart()
         {
             SetPath();
             GetUser();
             WorkWithDirectory(GetPath(), true);
+            WriteToFile();
+            CreateArchive();
         }
 
         public void GetUser()
         {
-             output.Append(Environment.UserName+":\n");
+            output.Append(Environment.UserName + ":\n");
         }
+
         public string GetPath()
         {
             string pathForScanning = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            //string pathForScanning = @"C:\Users\Taras\Desktop\Tree";
             return pathForScanning;
         }
+
         public void SetPath()
         {
-            pathToWriting = $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\\DirectoryTree.txt";
+            pathToWriting = $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\\Pavlenko.txt";
+            pathForArchive = $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\\Pavlenko.zip";
+        }
+
+        public void CreateArchive()
+        {
+            using (FileStream fileStream = File.Open(pathToWriting, FileMode.Open))
+            {
+                using (FileStream compressedFile = File.Create(pathForArchive))
+                {
+                    using (GZipStream compressionStream = new GZipStream(compressedFile, CompressionMode.Compress))
+                    {
+                        fileStream.CopyTo(compressionStream);
+                    }
+                }
+            }
+            File.Delete(pathToWriting);
         }
 
         public void WorkWithDirectory(string pathForScanning, bool flag)
@@ -45,7 +66,6 @@ namespace DIrectoryTree
                     foreach (var dir in directories)
                     {
                         Indent(true);
-                        //Console.WriteLine(tab + dir.Name + ":");
                         output.Append(tab + dir.Name + ":\n");
                         WorkWithDirectory(dir.FullName, true);
                         Indent(false);
@@ -53,14 +73,12 @@ namespace DIrectoryTree
                     foreach (var file in files)
                     {
                         Indent(true);
-                        //Console.WriteLine(tab + "-" + file);
                         output.Append(tab + "-" + file + "\n");
                         Indent(false);
                     }
                 }
                 else
                 {
-                    //Console.WriteLine("The path is not exist");
                     output.Append("The path is not exist");
                 }
             }
@@ -68,6 +86,7 @@ namespace DIrectoryTree
             {
             }
         }
+
         public void Indent(bool flag)
         {
             var app = "    ";
@@ -83,9 +102,11 @@ namespace DIrectoryTree
 
         public void WriteToFile()
         {
-            StreamWriter streamWriter = new StreamWriter(pathToWriting);
-            streamWriter.Write(output);
-            streamWriter.Close();
+            using (StreamWriter streamWriter = new StreamWriter(pathToWriting))
+            {
+                streamWriter.Write(output);
+            }
         }
+
     }
 }

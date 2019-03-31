@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DIrectoryTree
 {
@@ -11,9 +7,9 @@ namespace DIrectoryTree
         static void Main(string[] args)
         {
             DirectoryProccesing directory = new DirectoryProccesing();
-            directory.WriteToFile();
+            directory.GetStart();
 
-            Console.WriteLine("Done");
+            Console.WriteLine("Process is done!");
             Console.ReadKey();
         }
     }
